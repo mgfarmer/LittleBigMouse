@@ -241,7 +241,7 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 	ResetClip();
 	if(CheckForStopped(e)) return;
 
-	bool isShiftKeyPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0);
+	bool isShiftKeyPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
 	const auto pIn = e.Point;
 
 	const ZoneLink* zoneOut;
