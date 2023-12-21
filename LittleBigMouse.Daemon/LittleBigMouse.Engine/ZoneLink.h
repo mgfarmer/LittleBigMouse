@@ -15,6 +15,8 @@ public:
 	long SourceToPixel;
 	long TargetFromPixel;
 	long TargetToPixel;
+	bool RequireShiftKeyForVerticalTransition;
+	bool RequireShiftKeyForHorizontalTransition;
 	//long SourceLengthPixel;
 	//long TargetLengthPixel;
 	Zone* At(const double pos) const;

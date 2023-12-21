@@ -241,6 +241,7 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 	ResetClip();
 	if(CheckForStopped(e)) return;
 
+	bool isShiftKeyPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0);
 	const auto pIn = e.Point;
 
 	const ZoneLink* zoneOut;
@@ -252,6 +253,11 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		zoneOut = _oldZone->RightZones->AtPixel(pIn.Y());
 		if (zoneOut->Target)
 		{
+			if (zoneOut->RequireShiftKeyForHorizontalTransition && !isShiftKeyPressed) {
+				NoZoneMatches(e);
+				return;
+			}
+
 			pOut = { zoneOut->Target->PixelsBounds().Left(),zoneOut->ToTargetPixel(pIn.Y()) };
 		}
 		else
@@ -266,6 +272,11 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		zoneOut = _oldZone->LeftZones->AtPixel(pIn.Y());
 		if (zoneOut->Target)
 		{
+			if (zoneOut->RequireShiftKeyForHorizontalTransition && !isShiftKeyPressed) {
+				NoZoneMatches(e);
+				return;
+			}
+
 			pOut = { zoneOut->Target->PixelsBounds().Right() - 1,zoneOut->ToTargetPixel(pIn.Y()) };
 		}
 		else
@@ -280,6 +291,10 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		zoneOut = _oldZone->BottomZones->AtPixel(pIn.X());
 		if (zoneOut->Target)
 		{
+			if (zoneOut->RequireShiftKeyForVerticalTransition && !isShiftKeyPressed) {
+				NoZoneMatches(e);
+				return;
+			}
 			pOut = { zoneOut->ToTargetPixel(pIn.X()), zoneOut->Target->PixelsBounds().Top() };
 		}
 		else
@@ -294,6 +309,10 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		zoneOut = _oldZone->TopZones->AtPixel(pIn.X());
 		if (zoneOut->Target)
 		{
+			if (zoneOut->RequireShiftKeyForVerticalTransition && !isShiftKeyPressed) {
+				NoZoneMatches(e);
+				return;
+			}
 			pOut = { zoneOut->ToTargetPixel(pIn.X()),zoneOut->Target->PixelsBounds().Bottom() - 1 };
 		}
 		else
@@ -327,6 +346,10 @@ void MouseEngine::Move(MouseEventArg& e, const geo::Point<long>& pOut, const Zon
 	_oldPoint = pOut;
 
 	const auto r = zoneOut->PixelsBounds();
+
+#if defined(_DEBUG)
+	std::cout << "key " << GetAsyncKeyState(VK_SHIFT) << "\n";
+#endif
 
 	SaveClip();
 	auto pos = e.Point;
