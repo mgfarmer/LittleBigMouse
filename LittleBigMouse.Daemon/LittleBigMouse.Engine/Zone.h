@@ -43,6 +43,11 @@ public:
 	ZoneLink* RightZones;
 	ZoneLink* BottomZones;
 
+	bool ExitTriggerLeft;
+	bool ExitTriggerRight;
+	bool ExitTriggerTop;
+	bool ExitTriggerBottom;
+
 	[[nodiscard]] bool IsMain() const;
 
 	double Dpi;

@@ -241,19 +241,22 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 	ResetClip();
 	if(CheckForStopped(e)) return;
 
-	bool isShiftKeyPressed = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) == 0x8000);
+	int triggerKey = VK_CONTROL;
+	bool isTriggerKeyPressed = ((GetAsyncKeyState(triggerKey) & 0x8000) == 0x8000);
 	const auto pIn = e.Point;
 
 	const ZoneLink* zoneOut;
 	geo::Point<long> pOut;
 	const auto bounds = _oldZone->PixelsBounds();
+
 	// leaving zone by right
 	if (pIn.X() >= bounds.Right())
 	{
 		zoneOut = _oldZone->RightZones->AtPixel(pIn.Y());
 		if (zoneOut->Target)
 		{
-			if (zoneOut->RequireShiftKeyForHorizontalTransition && !isShiftKeyPressed) {
+			if (_oldZone->ExitTriggerRight && !isTriggerKeyPressed)
+			{
 				NoZoneMatches(e);
 				return;
 			}
@@ -272,7 +275,8 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		zoneOut = _oldZone->LeftZones->AtPixel(pIn.Y());
 		if (zoneOut->Target)
 		{
-			if (zoneOut->RequireShiftKeyForHorizontalTransition && !isShiftKeyPressed) {
+			if (_oldZone->ExitTriggerLeft && !isTriggerKeyPressed)
+			{
 				NoZoneMatches(e);
 				return;
 			}
@@ -291,7 +295,8 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		zoneOut = _oldZone->BottomZones->AtPixel(pIn.X());
 		if (zoneOut->Target)
 		{
-			if (zoneOut->RequireShiftKeyForVerticalTransition && !isShiftKeyPressed) {
+			if (_oldZone->ExitTriggerBottom && !isTriggerKeyPressed)
+			{
 				NoZoneMatches(e);
 				return;
 			}
@@ -309,7 +314,8 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		zoneOut = _oldZone->TopZones->AtPixel(pIn.X());
 		if (zoneOut->Target)
 		{
-			if (zoneOut->RequireShiftKeyForVerticalTransition && !isShiftKeyPressed) {
+			if (_oldZone->ExitTriggerTop && !isTriggerKeyPressed)
+			{
 				NoZoneMatches(e);
 				return;
 			}

@@ -127,6 +127,15 @@ Zone::Zone(int id, std::string deviceId, std::string name, const geo::Rect<long>
 		_physicalBounds.Width()-pixelWidth,
 		_physicalBounds.Height()-pixelHeight);
 
+
+#if defined(_DEBUG)
+	std::cout << "Create Zone: " << id << " " << DeviceId << "\n";
+#endif
+
+	ExitTriggerBottom = true;
+	ExitTriggerTop = true;
+	ExitTriggerLeft = false;
+	ExitTriggerRight = false;
 }
 
 
