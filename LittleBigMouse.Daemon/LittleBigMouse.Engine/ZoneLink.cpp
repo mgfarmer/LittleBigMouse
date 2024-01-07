@@ -35,6 +35,4 @@ ZoneLink::ZoneLink(const double from, const double to, const long sourceFromPixe
 {
 	Target = nullptr;
 	Next = nullptr;
-	RequireShiftKeyForVerticalTransition = true;
-	RequireShiftKeyForHorizontalTransition = false;
 }
