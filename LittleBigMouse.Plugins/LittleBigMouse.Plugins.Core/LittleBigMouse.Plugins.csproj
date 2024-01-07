@@ -5,11 +5,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>x64;x86;AnyCpu</Platforms>
-	<Version>5.0.4.1</Version>
+	<Version>5.0.5.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\HLab\HLab.Mvvm.Annotations\HLab.Mvvm.Annotations.csproj" />
+    <ProjectReference Include="..\..\HLab.Core\HLab.Mvvm.Annotations\HLab.Mvvm.Annotations.csproj" />
     <ProjectReference Include="..\..\LittleBigMouse.Core\LittleBigMouse.DisplayLayout\LittleBigMouse.DisplayLayout.csproj" />
   </ItemGroup>
 

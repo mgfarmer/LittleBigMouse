@@ -12,7 +12,7 @@
 		<PackageIcon>lbm.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/mgth/LittleBigMouse</RepositoryUrl>
-		<Version>5.0.4.1</Version>
+		<Version>5.0.5.0</Version>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<StartupObject>LittleBigMouse.Ui.Avalonia.Program</StartupObject>
 		<Title>Little Big Mouse</Title>
@@ -97,11 +97,12 @@
 
 
 <ItemGroup>
-  <ProjectReference Include="..\..\HLab\HLab.Base.Avalonia\HLab.Base.Avalonia.csproj" />
-  <ProjectReference Include="..\..\HLab\HLab.Mvvm.Avalonia\HLab.Mvvm.Avalonia.csproj" />
-  <ProjectReference Include="..\..\HLab\HLab.Mvvm.ReactiveUI\HLab.Mvvm.ReactiveUI.csproj" />
-  <ProjectReference Include="..\..\HLab\HLab.UserNotification.Avalonia\HLab.UserNotification.Avalonia.csproj" />
-  <ProjectReference Include="..\..\HLab\HLab.UserNotification\HLab.UserNotification.csproj" />
+  <ProjectReference Include="..\..\HLab.Avalonia\HLab.Base.Avalonia\HLab.Base.Avalonia.csproj" />
+  <ProjectReference Include="..\..\HLab.Avalonia\HLab.Bugs.Avalonia\HLab.Bugs.Avalonia.csproj" />
+  <ProjectReference Include="..\..\HLab.Avalonia\HLab.Mvvm.Avalonia\HLab.Mvvm.Avalonia.csproj" />
+  <ProjectReference Include="..\..\HLab.Avalonia\HLab.UserNotification.Avalonia\HLab.UserNotification.Avalonia.csproj" />
+  <ProjectReference Include="..\..\HLab.Core\HLab.Mvvm.ReactiveUI\HLab.Mvvm.ReactiveUI.csproj" />
+  <ProjectReference Include="..\..\HLab.Core\HLab.UserNotification\HLab.UserNotification.csproj" />
   <ProjectReference Include="..\..\LittleBigMouse.Core\LittleBigMouse.DisplayLayout\LittleBigMouse.DisplayLayout.csproj" />
   <ProjectReference Include="..\..\LittleBigMouse.Plugins\LittleBigMouse.Plugin.Layout.Avalonia\LittleBigMouse.Plugin.Layout.Avalonia.csproj" />
   <ProjectReference Include="..\..\LittleBigMouse.Plugins\LittleBigMouse.Plugin.Vcp.Avalonia\LittleBigMouse.Plugin.Vcp.Avalonia.csproj" />

@@ -1,6 +1,6 @@
-[submodule "HLab"]
-	path = HLab
-	url = git@github.com:CHMP-HLab/HLab.git
-[submodule "Lib/Avalonia"]
-	path = Lib/Avalonia
-	url = git@github.com:mgth/Avalonia.git
+[submodule "HLab.Core"]
+	path = HLab.Core
+	url = https://github.com/mgth/HLab.Core.git
+[submodule "HLab.Avalonia"]
+	path = HLab.Avalonia
+	url = https://github.com/mgth/HLab.Avalonia.git
