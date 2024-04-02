@@ -68,7 +68,6 @@ std::string GetParentProcess()
 
 int main(int argc, char *argv[]){
 
-    //#if !defined(_DEBUG)
 	constexpr LPCWSTR szUniqueNamedMutex = L"LittleBigMouse_Daemon";
 
 	HANDLE hHandle = CreateMutex(nullptr, TRUE, szUniqueNamedMutex);
@@ -111,21 +110,28 @@ int main(int argc, char *argv[]){
 		}
 	}
 
-    auto daemon = LittleBigMouseDaemon(  &server, &engine, &hook );
+    auto daemon = LittleBigMouseDaemon( &server , &engine, &hook );
 
     if(uiMode)
     {
         #if defined(_DEBUG)
 	    std::cout << "Starting in UI mode\n";
         #endif
-		daemon.Run("");
+        try
+        {
+		    daemon.Run("");
+        }
+		catch(const std::exception& e)
+		{
+        	std::cerr << e.what() << '\n';
+        }
 	}
 	else
 	{
         #if defined(_DEBUG)
 		std::cout << "Starting in Daemon mode\n";
         #endif
-		daemon.Run("(\Mgth\LittleBigMouse\Current.xml)");
+		daemon.Run("\\Mgth\\LittleBigMouse\\Current.xml");
 	}
 
     if(hHandle)
