@@ -587,4 +587,8 @@ public class VcpScreenViewModel : ViewModel<PhysicalMonitor>
         Vcp.SetSource(12);
     }
 
+    public override void OnDispose()
+    {
+        VcpExpendMonitor.Stop();
+    }
 }
