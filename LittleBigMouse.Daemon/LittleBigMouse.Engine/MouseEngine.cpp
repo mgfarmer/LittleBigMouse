@@ -236,6 +236,9 @@ void MouseEngine::OnMouseMoveCross(MouseEventArg& e)
 	NoZoneMatches(e);
 }
 
+int stallCount = 0;
+int maxStallCount = 250;
+
 void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 {
 	ResetClip();
@@ -297,13 +300,24 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		{
 			if (_oldZone->ExitTriggerBottom && !isTriggerKeyPressed)
 			{
-				NoZoneMatches(e);
-				return;
+				stallCount++;
+				if (stallCount < maxStallCount) {
+#if defined(_DEBUG)
+					std::cout << "count " << stallCount << "\n";
+#endif
+					NoZoneMatches(e);
+					return;
+				}
+				else {
+					stallCount = 0;
+				}
 			}
+			stallCount = 0;
 			pOut = { zoneOut->ToTargetPixel(pIn.X()), zoneOut->Target->PixelsBounds().Top() };
 		}
 		else
 		{
+			stallCount = 0;
 			NoZoneMatches(e);
 			return;
 		}
@@ -316,19 +330,30 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		{
 			if (_oldZone->ExitTriggerTop && !isTriggerKeyPressed)
 			{
-				NoZoneMatches(e);
-				return;
+				stallCount++;
+				if (stallCount < maxStallCount) {
+#if defined(_DEBUG)
+					std::cout << "count " << stallCount << "\n";
+#endif
+					NoZoneMatches(e);
+					return;
+				}
+				else {
+					stallCount = 0;
+				}
 			}
 			pOut = { zoneOut->ToTargetPixel(pIn.X()),zoneOut->Target->PixelsBounds().Bottom() - 1 };
 		}
 		else
 		{
+			stallCount = 0;
 			NoZoneMatches(e);
 			return;
 		}
 	}
 	else
 	{
+		stallCount = 0;
 		_oldPoint = pIn;
 		e.Handled = false;
 		return;
