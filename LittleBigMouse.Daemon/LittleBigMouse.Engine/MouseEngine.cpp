@@ -323,7 +323,6 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 	const ZoneLink* zoneOut;
 	geo::Point<long> pOut;
 	const auto bounds = _oldZone->PixelsBounds();
-
 	// leaving zone by right
 	if (pIn.X() >= bounds.Right())
 	{
@@ -362,7 +361,6 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		}
 		else
 		{
-			//stallCount = 0;
 			NoZoneMatches(e);
 			return;
 		}
@@ -377,7 +375,6 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		}
 		else
 		{
-			//stallCount = 0;
 			NoZoneMatches(e);
 			return;
 		}
@@ -408,10 +405,6 @@ void MouseEngine::Move(MouseEventArg& e, const geo::Point<long>& pOut, const Zon
 	_oldPoint = pOut;
 
 	const auto r = zoneOut->PixelsBounds();
-
-#if defined(_DEBUG)
-	std::cout << "key " << GetAsyncKeyState(VK_SHIFT) << "\n";
-#endif
 
 	SaveClip();
 	auto pos = e.Point;
