@@ -94,6 +94,100 @@ static int GetEnvInt(const std::wstring& varName, int def = 0)
     return num;
 }
 
+static void configureControlledCross(MouseEngine* engine) {
+    /*
+    * LBM_CC_HORZ_EDGE <- Defined or not, value is not used
+    *
+    * This envar, when defined, makes all horizontaol edges into
+    * controlled crossings. The primary used case is when you
+    * have vertically stacked monitors. For instance, I have 3
+    * side-by-side monitors, with a fourth monitor above the middle
+    * monitor. Without controlled crossings interacting with the
+    * main menu of full screen apps (near the top edge), or interacting 
+    * with the taskbar on the upper monitor (near the bottom edge) is 
+    * frustrating because the cursor too easily jumps to the monitor 
+    * above or below the interaction zone. This is especially true
+    * when using full-screen RDP which requires holding the cursor at 
+    * the very top of the screen.
+    */
+    engine->enableControlHorzEdgeCrossing = false;
+    std::string envar = GetEnv(L"LBM_CC_HORZ_EDGE");
+#if defined(_DEBUG)
+    std::cout << "LBM_CC_THRESHOLD is: " << envar << '\n';
+#endif
+    if (envar.size() != 0) {
+        engine->enableControlHorzEdgeCrossing = true;
+    }
+
+    /*
+    * LBM_CC_VERT_EDGE <- Defined or not, value is not used
+    * 
+    * This envar, when defined, makes all vertical edges into
+    * controlled crossings.  It is implemented for completeness,
+    * though I have not come up with a good use case for it.
+    */
+    engine->enableControlVertEdgeCrossing = false;
+    envar = GetEnv(L"LBM_CC_VERT_EDGE");
+#if defined(_DEBUG)
+    std::cout << "LBM_CC_VERT_EDGE is: " << envar << '\n';
+#endif
+    if (envar.size() != 0) {
+        engine->enableControlVertEdgeCrossing = true;
+    }
+
+    /*
+    * LBM_CC_CTRL_KEY <- Defined or not, value is not used
+    * 
+    * The envar, when defined, allows crossing a controlled edges
+    * immediately if the Ctrl key is pressed while moving the mouse.
+    * This can be used in concert with the LBM_CC_THRESHOLD envar.
+    */
+    engine->enableCtrlKeyCrossing = false;
+    envar = GetEnv(L"LBM_CC_CTRL_KEY");
+#if defined(_DEBUG)
+    std::cout << "LBM_CC_CTRL_KEY is: " << envar << '\n';
+#endif
+    if (envar.size() != 0) {
+        engine->enableCtrlKeyCrossing = true;
+    }
+
+    /*
+    * LBM_CC_THRESHOLD <- Integer > 0
+    *
+    * This threshold controls how much effort is required to push the mouse
+    * cursor across a controlled edge.  Try values around 200 to 250.  The
+    * value that works best for you depends a lot on how you habitually
+    * move your mouse so some tuning may be required.
+    *
+    * The cursor will stall at the edge until you push long enough, then
+    * it will cross.
+    * 
+    * When undefined, or the value is less than 1, no amount of pushing
+    * will allow the cursor across.
+    */
+    engine->controlCrossingThreshold = 0;
+    int thresh = GetEnvInt(L"LBM_CC_THRESHOLD");
+#if defined(_DEBUG)
+    std::cout << "LBM_CC_THRESHOLD is: " << thresh << '\n';
+#endif
+    if (thresh > 0) {
+        engine->controlCrossingThreshold = thresh;
+    }
+
+    /*
+    * Make sure the user does not configure in a way that prevent all edge
+    * crossings. If so, then disable edge crossing checks completely.  One
+    * (or both) of LBM_CC_THRESHOLD and LBM_CC_CTRL_KEY must be defined
+    * otherwise no controlled edges would ever allow crossings.
+    */
+    if (engine->enableControlHorzEdgeCrossing || engine->enableControlVertEdgeCrossing) {
+        if (!engine->enableCtrlKeyCrossing && engine->controlCrossingThreshold < 1) {
+            engine->enableControlHorzEdgeCrossing = false;
+            engine->enableControlVertEdgeCrossing = false;
+        }
+    }
+}
+
 int main(int argc, char *argv[]){
 
 	constexpr LPCWSTR szUniqueNamedMutex = L"LittleBigMouse_Daemon";
@@ -122,52 +216,8 @@ int main(int argc, char *argv[]){
     MouseEngine engine;
     Hooker hook;
 
-    // Gather environment variables for the engine
+    configureControlledCross(&engine);
 
-    engine.controlCrossingThreshold = 0;
-    int thresh = GetEnvInt(L"LBM_CC_THRESHOLD");
-#if defined(_DEBUG)
-    std::cout << "LBM_CC_THRESHOLD is: " << thresh << '\n';
-#endif
-    if (thresh > 1) {
-        engine.controlCrossingThreshold = thresh;
-    }
-
-    engine.enableControlHorzEdgeCrossing = false;
-    std::string envar = GetEnv(L"LBM_CC_HORZ_EDGE");
-#if defined(_DEBUG)
-    std::cout << "LBM_CC_THRESHOLD is: " << envar << '\n';
-#endif
-    if (envar.size() != 0) {
-        engine.enableControlHorzEdgeCrossing = true;
-    }
-
-    engine.enableControlVertEdgeCrossing = false;
-    envar = GetEnv(L"LBM_CC_VERT_EDGE");
-#if defined(_DEBUG)
-    std::cout << "LBM_CC_VERT_EDGE is: " << envar << '\n';
-#endif
-    if (envar.size() != 0) {
-        engine.enableControlVertEdgeCrossing = true;
-    }
-
-    engine.enableCtrlKeyCrossing = false;
-    envar = GetEnv(L"LBM_CC_CTRL_KEY");
-#if defined(_DEBUG)
-    std::cout << "LBM_CC_CTRL_KEY is: " << envar << '\n';
-#endif
-    if (envar.size() != 0) {
-        engine.enableCtrlKeyCrossing = true;
-    }
-
-    // Make sure the user does not configure in a way that prevent all edge crossings.
-    // If so, then disable edge crossing checks completely.
-    if (engine.enableControlHorzEdgeCrossing || engine.enableControlVertEdgeCrossing) {
-        if (!engine.enableCtrlKeyCrossing && engine.controlCrossingThreshold < 1) {
-            engine.enableControlHorzEdgeCrossing = false;
-            engine.enableControlVertEdgeCrossing = false;
-        }
-    }
     auto p = GetParentProcess();
 
     // Test if daemon was started from UI

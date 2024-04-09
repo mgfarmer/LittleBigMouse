@@ -236,46 +236,80 @@ void MouseEngine::OnMouseMoveCross(MouseEventArg& e)
 	NoZoneMatches(e);
 }
 
+/*
+* Keeps track of the mount of pushing required to cross
+* a controlled adge.  It basically counts mouse event that 
+* try to cross the edge and when the count exceeds the
+* configured threshold, the cross is allowed to happen.
+* Any movemnt away from the edge causes the counter to
+* be reset.
+*/
 static int stallCount = 0;
 
+/*
+* This function implements al the code logic used to determine
+* if a controlled crossing needs to be managed for this event.
+* If a crossing is disallowed this function retuns false, other
+* wise true is returned and the crossing is permitted.
+*/
 static bool canCross(bool checkEdge, MouseEngine* engine, MouseEventArg& e) {
+	/*
+	* If this edge is not being controlled, immediately return true
+	* to allow the crossing.
+	*/
 	if (!checkEdge) {
 #if defined(_DEBUG)
 		std::cout << "edge not checked\n";
 #endif
+		/*
+		* Allow the crossing ad reset the counter
+		*/
 		stallCount = 0;
-		// Allow transistion
 		return true;
 	}
 
+	/*
+	* If CTRL key crossing  is enable, check it's state.  If pressed
+	* allow the crossing, return true.
+	*/
 	if (engine->enableCtrlKeyCrossing) {
 		bool isTriggerKeyPressed = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) == 0x8000);
 		if (isTriggerKeyPressed) {
 #if defined(_DEBUG)
 			std::cout << "trigger key pressed\n";
 #endif
+			/*
+			* Allow the crossing ad reset the counter
+			*/
 			stallCount = 0;
-			// Allow transistion
 			return true;
 		}
 	}
-
-	
+	/*
+	* If threshold crossing is not being used, then this edge cannot be
+	* crossed (except by CTRL key crossing above)
+	*/
 	if (engine->controlCrossingThreshold < 1) {
-		// Cannot cross
 		return false;
 	}
 
+	/*
+	* Threshold crossing is configured at this point.  Increment the
+	* counter, then check to see if we exceeded the threshold.  If we
+	* can cross, reset the counter.
+	*/
 	stallCount++;
 #if defined(_DEBUG)
 	std::cout << "threshold: " << stallCount << " of " << engine->controlCrossingThreshold << "\n";
 #endif
 	if (stallCount > engine->controlCrossingThreshold) {
+		/*
+		* Allow the crossing ad reset the counter
+		*/
 		stallCount = 0;
-		// Can cross now
 		return true;
 	}
-	// Cannot cross
+
 	return false;
 }
 
