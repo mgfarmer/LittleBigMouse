@@ -98,8 +98,8 @@ static void configureControlledCross(MouseEngine* engine) {
     /*
     * LBM_CC_HORZ_EDGE <- Defined or not, value is not used
     *
-    * This envar, when defined, makes all horizontaol edges into
-    * controlled crossings. The primary used case is when you
+    * This envar, when defined, makes all horizontal edges into
+    * controlled crossings. The primary use case is when you
     * have vertically stacked monitors. For instance, I have 3
     * side-by-side monitors, with a fourth monitor above the middle
     * monitor. Without controlled crossings interacting with the
@@ -138,7 +138,7 @@ static void configureControlledCross(MouseEngine* engine) {
     /*
     * LBM_CC_CTRL_KEY <- Defined or not, value is not used
     * 
-    * The envar, when defined, allows crossing a controlled edges
+    * The envar, when defined, allows crossing a controlled edge
     * immediately if the Ctrl key is pressed while moving the mouse.
     * This can be used in concert with the LBM_CC_THRESHOLD envar.
     */
