@@ -237,7 +237,6 @@ void MouseEngine::OnMouseMoveCross(MouseEventArg& e)
 }
 
 int stallCount = 0;
-int maxStallCount = 250;
 
 void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 {
@@ -245,7 +244,6 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 	if(CheckForStopped(e)) return;
 
 	int triggerKey = VK_CONTROL;
-	bool isTriggerKeyPressed = ((GetAsyncKeyState(triggerKey) & 0x8000) == 0x8000);
 	const auto pIn = e.Point;
 
 	const ZoneLink* zoneOut;
@@ -258,11 +256,23 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		zoneOut = _oldZone->RightZones->AtPixel(pIn.Y());
 		if (zoneOut->Target)
 		{
-			if (_oldZone->ExitTriggerRight && !isTriggerKeyPressed)
+			bool isTriggerKeyPressed = enableCtrlKeyCrossing && ((GetAsyncKeyState(triggerKey) & 0x8000) == 0x8000);
+			if (enableControlVertEdgeCrossing && !isTriggerKeyPressed)
 			{
-				NoZoneMatches(e);
-				return;
+				stallCount++;
+				if (stallCount < controlCrossingThreshold) {
+#if defined(_DEBUG)
+					std::cout << "count " << stallCount << "\n";
+#endif
+					NoZoneMatches(e);
+					return;
+				}
+				else {
+					stallCount = 0;
+				}
 			}
+			stallCount = 0;
+			pOut = { zoneOut->ToTargetPixel(pIn.X()), zoneOut->Target->PixelsBounds().Top() };
 
 			pOut = { zoneOut->Target->PixelsBounds().Left(),zoneOut->ToTargetPixel(pIn.Y()) };
 		}
@@ -278,11 +288,23 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		zoneOut = _oldZone->LeftZones->AtPixel(pIn.Y());
 		if (zoneOut->Target)
 		{
-			if (_oldZone->ExitTriggerLeft && !isTriggerKeyPressed)
+			bool isTriggerKeyPressed = enableCtrlKeyCrossing && ((GetAsyncKeyState(triggerKey) & 0x8000) == 0x8000);
+			if (enableControlVertEdgeCrossing && !isTriggerKeyPressed)
 			{
-				NoZoneMatches(e);
-				return;
+				stallCount++;
+				if (stallCount < controlCrossingThreshold) {
+#if defined(_DEBUG)
+					std::cout << "count " << stallCount << "\n";
+#endif
+					NoZoneMatches(e);
+					return;
+				}
+				else {
+					stallCount = 0;
+				}
 			}
+			stallCount = 0;
+			pOut = { zoneOut->ToTargetPixel(pIn.X()), zoneOut->Target->PixelsBounds().Top() };
 
 			pOut = { zoneOut->Target->PixelsBounds().Right() - 1,zoneOut->ToTargetPixel(pIn.Y()) };
 		}
@@ -298,10 +320,11 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		zoneOut = _oldZone->BottomZones->AtPixel(pIn.X());
 		if (zoneOut->Target)
 		{
-			if (_oldZone->ExitTriggerBottom && !isTriggerKeyPressed)
+			bool isTriggerKeyPressed = enableCtrlKeyCrossing && ((GetAsyncKeyState(triggerKey) & 0x8000) == 0x8000);
+			if (enableControlHorzEdgeCrossing && !isTriggerKeyPressed)
 			{
 				stallCount++;
-				if (stallCount < maxStallCount) {
+				if (stallCount < controlCrossingThreshold) {
 #if defined(_DEBUG)
 					std::cout << "count " << stallCount << "\n";
 #endif
@@ -328,10 +351,11 @@ void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)
 		zoneOut = _oldZone->TopZones->AtPixel(pIn.X());
 		if (zoneOut->Target)
 		{
-			if (_oldZone->ExitTriggerTop && !isTriggerKeyPressed)
+			bool isTriggerKeyPressed = enableCtrlKeyCrossing && ((GetAsyncKeyState(triggerKey) & 0x8000) == 0x8000);
+			if (enableControlHorzEdgeCrossing && !isTriggerKeyPressed)
 			{
 				stallCount++;
-				if (stallCount < maxStallCount) {
+				if (stallCount < controlCrossingThreshold) {
 #if defined(_DEBUG)
 					std::cout << "count " << stallCount << "\n";
 #endif

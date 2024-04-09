@@ -52,5 +52,10 @@ public:
 
 	ZonesLayout Layout = ZonesLayout();
 
+	bool enableControlHorzEdgeCrossing = false;
+	bool enableControlVertEdgeCrossing = false;
+	bool enableCtrlKeyCrossing = false;
+	int  controlCrossingThreshold = 0;
+
 };
 

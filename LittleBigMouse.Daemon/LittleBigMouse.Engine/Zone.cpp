@@ -131,11 +131,6 @@ Zone::Zone(int id, std::string deviceId, std::string name, const geo::Rect<long>
 #if defined(_DEBUG)
 	std::cout << "Create Zone: " << id << " " << DeviceId << "\n";
 #endif
-
-	ExitTriggerBottom = true;
-	ExitTriggerTop = true;
-	ExitTriggerLeft = false;
-	ExitTriggerRight = false;
 }
 
 

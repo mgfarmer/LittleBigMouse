@@ -66,6 +66,34 @@ std::string GetParentProcess()
 	return std::string(ws.begin(), ws.end());
 }
 
+static std::string GetEnv(const std::wstring& varName)
+{
+    std::wstring str;
+    DWORD len = GetEnvironmentVariableW(varName.c_str(), NULL, 0);
+    if (len > 0)
+    {
+        str.resize(len);
+        str.resize(GetEnvironmentVariableW(varName.c_str(), &str[0], len));
+    }
+    return std::string(str.begin(), str.end());
+}
+
+static int GetEnvInt(const std::wstring& varName, int def = -1)
+{
+    int num = def;
+    std::string envar = GetEnv(varName);
+    try {
+        num = std::stoi(envar);
+    }
+    catch (std::invalid_argument& e) {
+        //std::cout << "That is not a valid number." << '\n';
+    }
+    catch (std::out_of_range& e) {
+        //std::cout << "That is not a valid number." << '\n';
+    }
+    return num;
+}
+
 int main(int argc, char *argv[]){
 
 	constexpr LPCWSTR szUniqueNamedMutex = L"LittleBigMouse_Daemon";
@@ -93,6 +121,40 @@ int main(int argc, char *argv[]){
     RemoteServerSocket server;
     MouseEngine engine;
     Hooker hook;
+
+    // Gather environment variables for the engine
+
+    int thresh = GetEnvInt(L"LBM_CC_THRESHOLD");
+#if defined(_DEBUG)
+    std::cout << "LBM_CC_THRESHOLD is: " << thresh << '\n';
+#endif
+    if (thresh != -1) {
+        engine.controlCrossingThreshold = thresh;
+    }
+
+    std::string envar = GetEnv(L"LBM_CC_HORZ_EDGE");
+#if defined(_DEBUG)
+    std::cout << "LBM_CC_THRESHOLD is: " << envar << '\n';
+#endif
+    if (envar.size() != 0) {
+        engine.enableControlHorzEdgeCrossing = true;
+    }
+
+    envar = GetEnv(L"LBM_CC_VERT_EDGE");
+#if defined(_DEBUG)
+    std::cout << "LBM_CC_VERT_EDGE is: " << envar << '\n';
+#endif
+    if (envar.size() != 0) {
+        engine.enableControlVertEdgeCrossing = true;
+    }
+
+    envar = GetEnv(L"LBM_CC_CTRL_KEY");
+#if defined(_DEBUG)
+    std::cout << "LBM_CC_CTRL_KEY is: " << envar << '\n';
+#endif
+    if (envar.size() != 0) {
+        engine.enableCtrlKeyCrossing = true;
+    }
 
     auto p = GetParentProcess();
 
