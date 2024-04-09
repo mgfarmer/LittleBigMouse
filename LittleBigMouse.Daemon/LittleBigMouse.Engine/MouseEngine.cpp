@@ -236,9 +236,9 @@ void MouseEngine::OnMouseMoveCross(MouseEventArg& e)
 	NoZoneMatches(e);
 }
 
-int stallCount = 0;
+static int stallCount = 0;
 
-bool canCross(bool checkEdge, MouseEngine* engine, MouseEventArg& e) {
+static bool canCross(bool checkEdge, MouseEngine* engine, MouseEventArg& e) {
 	if (!checkEdge) {
 #if defined(_DEBUG)
 		std::cout << "edge not checked\n";
@@ -248,28 +248,35 @@ bool canCross(bool checkEdge, MouseEngine* engine, MouseEventArg& e) {
 		return true;
 	}
 
-	bool isTriggerKeyPressed = engine->enableCtrlKeyCrossing && ((GetAsyncKeyState(VK_CONTROL) & 0x8000) == 0x8000);
-	if (isTriggerKeyPressed) {
+	if (engine->enableCtrlKeyCrossing) {
+		bool isTriggerKeyPressed = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) == 0x8000);
+		if (isTriggerKeyPressed) {
 #if defined(_DEBUG)
-		std::cout << "trigger key pressed\n";
+			std::cout << "trigger key pressed\n";
 #endif
-		stallCount = 0;
-		// Allow transistion
-		return true;
+			stallCount = 0;
+			// Allow transistion
+			return true;
+		}
+	}
+
+	
+	if (engine->controlCrossingThreshold < 1) {
+		// Cannot cross
+		return false;
 	}
 
 	stallCount++;
 #if defined(_DEBUG)
-	std::cout << "count " << stallCount << "\n";
+	std::cout << "threshold: " << stallCount << " of " << engine->controlCrossingThreshold << "\n";
 #endif
-	if (stallCount < engine->controlCrossingThreshold) {
-		// Cannot cross yet
-		return false;
+	if (stallCount > engine->controlCrossingThreshold) {
+		stallCount = 0;
+		// Can cross now
+		return true;
 	}
-
-	stallCount = 0;
-	// Allow transistion
-	return true;
+	// Cannot cross
+	return false;
 }
 
 void MouseEngine::OnMouseMoveStraight(MouseEventArg& e)

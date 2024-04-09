@@ -78,7 +78,7 @@ static std::string GetEnv(const std::wstring& varName)
     return std::string(str.begin(), str.end());
 }
 
-static int GetEnvInt(const std::wstring& varName, int def = -1)
+static int GetEnvInt(const std::wstring& varName, int def = 0)
 {
     int num = def;
     std::string envar = GetEnv(varName);
@@ -124,14 +124,16 @@ int main(int argc, char *argv[]){
 
     // Gather environment variables for the engine
 
+    engine.controlCrossingThreshold = 0;
     int thresh = GetEnvInt(L"LBM_CC_THRESHOLD");
 #if defined(_DEBUG)
     std::cout << "LBM_CC_THRESHOLD is: " << thresh << '\n';
 #endif
-    if (thresh != -1) {
+    if (thresh > 1) {
         engine.controlCrossingThreshold = thresh;
     }
 
+    engine.enableControlHorzEdgeCrossing = false;
     std::string envar = GetEnv(L"LBM_CC_HORZ_EDGE");
 #if defined(_DEBUG)
     std::cout << "LBM_CC_THRESHOLD is: " << envar << '\n';
@@ -140,6 +142,7 @@ int main(int argc, char *argv[]){
         engine.enableControlHorzEdgeCrossing = true;
     }
 
+    engine.enableControlVertEdgeCrossing = false;
     envar = GetEnv(L"LBM_CC_VERT_EDGE");
 #if defined(_DEBUG)
     std::cout << "LBM_CC_VERT_EDGE is: " << envar << '\n';
@@ -148,6 +151,7 @@ int main(int argc, char *argv[]){
         engine.enableControlVertEdgeCrossing = true;
     }
 
+    engine.enableCtrlKeyCrossing = false;
     envar = GetEnv(L"LBM_CC_CTRL_KEY");
 #if defined(_DEBUG)
     std::cout << "LBM_CC_CTRL_KEY is: " << envar << '\n';
@@ -156,6 +160,14 @@ int main(int argc, char *argv[]){
         engine.enableCtrlKeyCrossing = true;
     }
 
+    // Make sure the user does not configure in a way that prevent all edge crossings.
+    // If so, then disable edge crossing checks completely.
+    if (engine.enableControlHorzEdgeCrossing || engine.enableControlVertEdgeCrossing) {
+        if (!engine.enableCtrlKeyCrossing && engine.controlCrossingThreshold < 1) {
+            engine.enableControlHorzEdgeCrossing = false;
+            engine.enableControlVertEdgeCrossing = false;
+        }
+    }
     auto p = GetParentProcess();
 
     // Test if daemon was started from UI
